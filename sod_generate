@@ -1,0 +1,28 @@
+#!/bin/bash
+
+[ ! -f input/COUNT ] && echo "CONFIG file not found in ./input/ directory" && exit
+[ ! -f input/KPOINTS ] && echo "KPOINTS file not found in ./input/ directory" && exit
+[ ! -f input/INCAR ] && echo "INCAR file not found in ./input/ directory" && exit
+[ ! -f input/POTCAR ] && echo "POTCAR file not found in ./input/ directory" && exit
+[ ! -f input/COUNT ] && echo "COUNT file not found in ./input/directory" && exit
+
+#sequence
+source input/COUNT
+
+if [ "$switch" -eq "1" ]; then
+   [ -d vasp_calculation ] && rm vasp_calculation -rf
+   mkdir vasp_calculation
+   cd vasp_calculation
+   for i in $(eval echo "{$star..$end..$step}"); do
+        mkdir SOD_$i
+        cd SOD_$i
+        cp ../../input/KPOINTS .
+        cp ../../input/INCAR .
+        cp ../../input/POTCAR .
+        cp ../../CALCS/c*$i.vasp POSCAR
+        [ -f ../../input/job ] && cp ../../input/job .
+
+        [ "$run_vasp" -eq "1" ] && qsub job
+        cd ..
+   done
+fi
